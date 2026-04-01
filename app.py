@@ -17,10 +17,14 @@ app.secret_key = os.environ.get('SECRET_KEY', 'srms_secret_key_2024_vcacs')
 
 # ─── DATABASE CONFIG ───────────────────────────────────────────────────────────
 # Replace with your Supabase PostgreSQL connection string
+# Change this line:
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
-    'postgresql://postgres.lmpelkcqwvximzvnobsr:nCg2UVPDxkZ3SvZJ@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres'
+    'postgresql://postgres.lmpelkcqwvximzvnobsr:nCg2UVPDxkZ3SvZJ@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require'
 )
+
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 def get_db():
     """Get a database connection."""
