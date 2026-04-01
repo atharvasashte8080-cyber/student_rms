@@ -89,7 +89,8 @@ def login():
             else:
                 flash('Invalid username or password.', 'error')
         except Exception as e:
-            flash('Database connection error. Check your config.', 'error')
+            print(f"DEBUG ERROR: {e}") # This shows the real error in the console
+            flash(f'Error: {str(e)}', 'error')
 
     return render_template('login.html')
 
