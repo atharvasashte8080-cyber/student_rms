@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}{{ student.first_name }} {{ student.last_name or '' }}{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+
+  <!-- ─── HEADER CARD ──────────────────── -->
+  <div class="profile-header card">
+    <div class="profile-avatar-lg">{{ student.first_name[0].upper() }}</div>
+    <div class="profile-meta">
+      <h2>{{ student.first_name }} {{ student.last_name or '' }}</h2>
+      <div class="profile-tags">
+        <span class="badge">{{ student.roll_no }}</span>
+        {% if student.department %}<span class="badge badge-green">{{ student.department }}</span>{% endif %}
+        {% if student.gender %}<span class="badge badge-purple">{{ student.gender }}</span>{% endif %}
+      </div>
+      <div class="profile-contact">
+        {% if student.email %}<span>✉ {{ student.email }}</span>{% endif %}
+        {% if student.phone_no %}<span>📞 {{ student.phone_no }}</span>{% endif %}
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="{{ url_for('edit_student', sid=student.id) }}" class="btn btn-primary">Edit Profile</a>
+      <a href="{{ url_for('view_students') }}" class="btn btn-ghost">← Back</a>
+    </div>
+  </div>
+
+  <!-- ─── INFO GRID ─────────────────────── -->
+  <div class="detail-grid">
+
+    <div class="card">
+      <div class="card-header"><h3>Personal Details</h3></div>
+      <div class="detail-list">
+        <div class="detail-row"><span>Date of Birth</span><span>{{ student.dob.strftime('%d %B %Y') if student.dob else '—' }}</span></div>
+        <div class="detail-row"><span>Gender</span><span>{{ student.gender or '—' }}</span></div>
+        <div class="detail-row"><span>Address</span><span>{{ student.address or '—' }}</span></div>
+        <div class="detail-row"><span>Admission Date</span><span>{{ student.admission_date.strftime('%d %B %Y') if student.admission_date else '—' }}</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>Guardian Details</h3></div>
+      <div class="detail-list">
+        <div class="detail-row"><span>Name</span><span>{{ student.guardian_name or '—' }}</span></div>
+        <div class="detail-row"><span>Contact</span><span>{{ student.guardian_contact or '—' }}</span></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+      <div class="card-header"><h3>Exam Results</h3></div>
+      {% if results %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Subject</th><th>Exam</th><th>Marks</th><th>Grade</th></tr></thead>
+          <tbody>
+          {% for r in results %}
+          <tr>
+            <td>{{ r.subject_name or '—' }}</td>
+            <td>{{ r.exam_type or '—' }}</td>
+            <td>{{ r.marks_obtained }}</td>
+            <td><span class="badge">{{ r.grade or '—' }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty-row">No results recorded yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Fees -->
+    <div class="card">
+      <div class="card-header"><h3>Fee Payments</h3></div>
+      {% if fees %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Amount</th><th>Date</th><th>Method</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for f in fees %}
+          <tr>
+            <td>₹{{ f.amount }}</td>
+            <td>{{ f.payment_date.strftime('%d %b %Y') if f.payment_date else '—' }}</td>
+            <td>{{ f.payment_method or '—' }}</td>
+            <td>
+              <span class="badge {% if f.payment_status == 'Paid' %}badge-green{% elif f.payment_status == 'Overdue' %}badge-red{% endif %}">
+                {{ f.payment_status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty-row">No fee records.</p>
+      {% endif %}
+    </div>
+
+    <!-- Attendance -->
+    <div class="card">
+      <div class="card-header"><h3>Recent Attendance</h3></div>
+      {% if attendance %}
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Course</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for a in attendance %}
+          <tr>
+            <td>{{ a.course_name or '—' }}</td>
+            <td>{{ a.date.strftime('%d %b %Y') if a.date else '—' }}</td>
+            <td>
+              <span class="badge {% if a.status == 'Present' %}badge-green{% elif a.status == 'Absent' %}badge-red{% else %}badge-orange{% endif %}">
+                {{ a.status }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty-row">No attendance records.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

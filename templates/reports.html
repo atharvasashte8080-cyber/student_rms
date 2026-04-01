@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports & Analytics{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="reports-page">
+
+  <!-- ─── CHART ROW ─────────────────────────────────── -->
+  <div class="charts-row">
+    <div class="card chart-card">
+      <div class="card-header">
+        <h3>Students by Department</h3>
+      </div>
+      <canvas id="deptChart" height="260"></canvas>
+    </div>
+    <div class="card chart-card">
+      <div class="card-header">
+        <h3>Gender Distribution</h3>
+      </div>
+      <canvas id="genderChart" height="260"></canvas>
+    </div>
+  </div>
+
+  <!-- ─── STATS ROW ─────────────────────────────────── -->
+  <div class="reports-grid">
+
+    <!-- Department Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Department Breakdown</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Department</th>
+              <th>Students</th>
+              <th>Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set total = namespace(cnt=0) %}
+            {% for d in dept_stats %}{% set total.cnt = total.cnt + d.cnt %}{% endfor %}
+            {% for d in dept_stats %}
+            <tr>
+              <td>{{ d.department or 'Unknown' }}</td>
+              <td><strong>{{ d.cnt }}</strong></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                    <div style="--width: {{ (d.cnt/total.cnt*100)|int if total.cnt else 0 }}%; 
+            height:100%; 
+            background:var(--accent); 
+            width:var(--width); 
+            border-radius:3px;">
+                    </div>
+                  </div>
+                  <span class="text-sm text-muted">{{ (d.cnt/total.cnt*100)|round(1) if total.cnt else 0 }}%</span>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="3" class="empty-row">No data</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Class Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Students per Class</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in class_stats %}
+            <tr>
+              <td>{{ c.class_name }}</td>
+              <td><span class="badge">{{ c.cnt }}</span></td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="2" class="empty-row">No data</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Fee Summary -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Fee Status Summary</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Records</th>
+              <th>Total Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for f in fee_summary %}
+            <tr>
+              <td>
+                <span
+                  class="badge {% if f.payment_status == 'Paid' %}badge-green{% elif f.payment_status == 'Overdue' %}badge-red{% else %}badge-orange{% endif %}">
+                  {{ f.payment_status }}
+                </span>
+              </td>
+              <td>{{ f.cnt }}</td>
+              <td>₹{{ f.total or 0 }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="3" class="empty-row">No fee data</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Monthly Admissions -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Monthly Admissions</h3>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>New Admissions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in monthly_admissions %}
+            <tr>
+              <td>{{ m.month }}</td>
+              <td><strong>{{ m.cnt }}</strong></td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="2" class="empty-row">No admission data</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Dept Chart
+  fetch('/api/dept-stats')
+    .then(r => r.json())
+    .then(data => {
+      new Chart(document.getElementById('deptChart'), {
+        type: 'bar',
+        data: {
+          labels: data.map(d => d.department || 'Unknown'),
+          datasets: [{
+            label: 'Students',
+            data: data.map(d => d.cnt),
+            backgroundColor: ['#2563eb', '#16a34a', '#ea580c', '#9333ea', '#0891b2', '#dc2626'],
+            borderRadius: 8,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }).catch(() => { });
+
+  // Gender Chart
+  fetch('/api/gender-stats')
+    .then(r => r.json())
+    .then(data => {
+      new Chart(document.getElementById('genderChart'), {
+        type: 'doughnut',
+        data: {
+          labels: data.map(d => d.gender || 'Unknown'),
+          datasets: [{
+            data: data.map(d => d.cnt),
+            backgroundColor: ['#2563eb', '#f97316', '#a855f7'],
+            borderWidth: 0,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 20, font: { family: 'DM Sans' } } }
+          },
+          cutout: '65%'
+        }
+      });
+    }).catch(() => { });
+</script>
+{% endblock %}

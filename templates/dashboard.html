@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dash-grid">
+
+  <!-- ─── STAT CARDS ──────────────────────────────── -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon stat-blue">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_students }}</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <a href="{{ url_for('view_students') }}" class="stat-arrow">→</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-green">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_courses }}</div>
+        <div class="stat-label">Total Courses</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-orange">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_teachers }}</div>
+        <div class="stat-label">Teachers</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon stat-purple">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+        </svg>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_classes }}</div>
+        <div class="stat-label">Classes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── RECENT STUDENTS ─────────────────────────── -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Recent Admissions</h3>
+      <a href="{{ url_for('view_students') }}" class="btn btn-ghost btn-sm">View All →</a>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Roll No</th>
+            <th>Department</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in recent_students %}
+          <tr>
+            <td>
+              <div class="name-cell">
+                <div class="avatar-sm">{{ s.first_name[0].upper() }}</div>
+                {{ s.first_name }} {{ s.last_name or '' }}
+              </div>
+            </td>
+            <td><span class="badge">{{ s.roll_no }}</span></td>
+            <td>{{ s.department or '—' }}</td>
+            <td class="text-muted">{{ s.email or '—' }}</td>
+            <td>
+              <a href="{{ url_for('student_detail', sid=s.id) }}" class="btn btn-xs btn-primary">View</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="empty-row">No students yet. <a href="{{ url_for('add_student') }}">Add one!</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── DEPT BREAKDOWN ──────────────────────────── -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Students by Department</h3>
+      <a href="{{ url_for('reports') }}" class="btn btn-ghost btn-sm">Full Report →</a>
+    </div>
+    {% if dept_stats %}
+    <div class="dept-bars">
+      {% set max_cnt = dept_stats[0].cnt if dept_stats else 1 %}
+      {% for d in dept_stats %}
+      <div class="dept-bar-item">
+        <span class="dept-bar-label">{{ d.department or 'Unknown' }}</span>
+        <div class="dept-bar-track">
+          <div class="dept-bar-fill" style="--w: {{ (d.cnt / max_cnt * 100)|int }}%; width: var(--w);">
+          </div>
+        </div>
+        <span class="dept-bar-count">{{ d.cnt }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-row">No data yet.</p>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

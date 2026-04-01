@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}About & Help{% endblock %}
+{% block page_title %}About & Help{% endblock %}
+
+{% block content %}
+<div class="about-page">
+
+  <div class="about-hero card">
+    <div class="about-icon">📚</div>
+    <h2>Student Record Management System</h2>
+    <p>A comprehensive web application for managing student data, academics, attendance, and fees — built as a Mini Project for VCACS College.</p>
+    <div class="about-tags">
+      <span class="badge">Flask (Python)</span>
+      <span class="badge">PostgreSQL</span>
+      <span class="badge badge-green">Supabase</span>
+      <span class="badge badge-purple">Chart.js</span>
+    </div>
+  </div>
+
+  <div class="about-grid">
+
+    <div class="card">
+      <div class="card-header"><h3>👤 Project Author</h3></div>
+      <div class="detail-list">
+        <div class="detail-row"><span>Name</span><span><strong>Shruti V. Bhosale</strong></span></div>
+        <div class="detail-row"><span>Class</span><span>S.Y. BSc (CS)</span></div>
+        <div class="detail-row"><span>Roll No</span><span>41</span></div>
+        <div class="detail-row"><span>College</span><span>VCACS College</span></div>
+        <div class="detail-row"><span>Project Type</span><span>Mini Project</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>⚙️ Tech Stack</h3></div>
+      <div class="detail-list">
+        <div class="detail-row"><span>Frontend</span><span>HTML5, CSS3, Vanilla JS</span></div>
+        <div class="detail-row"><span>Backend</span><span>Python 3 / Flask</span></div>
+        <div class="detail-row"><span>Database</span><span>PostgreSQL (Supabase)</span></div>
+        <div class="detail-row"><span>ORM/Driver</span><span>psycopg2</span></div>
+        <div class="detail-row"><span>Charts</span><span>Chart.js 4</span></div>
+        <div class="detail-row"><span>Templates</span><span>Jinja2</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>📋 Features Guide</h3></div>
+      <div class="help-list">
+        <div class="help-item">
+          <div class="help-icon">🏠</div>
+          <div><strong>Dashboard</strong> — Overview stats and recent admissions at a glance.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-icon">👥</div>
+          <div><strong>View Students</strong> — Search, filter, view, edit and delete student records.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-icon">➕</div>
+          <div><strong>Add Student</strong> — Multi-section form to register a new student.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-icon">📊</div>
+          <div><strong>Reports</strong> — Bar & donut charts plus detailed department/fee/attendance tables.</div>
+        </div>
+        <div class="help-item">
+          <div class="help-icon">👁</div>
+          <div><strong>Student Profile</strong> — Full profile with results, fees, attendance summary.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>🗄️ Database Tables</h3></div>
+      <div class="detail-list">
+        {% for t in ['users', 'students', 'classes', 'teachers', 'courses', 'subjects', 'enrollment', 'exams', 'results', 'attendance', 'fees'] %}
+        <div class="detail-row">
+          <span><code>{{ t }}</code></span>
+          <span class="badge badge-green">Active</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h3>🚀 Setup Instructions</h3></div>
+      <div class="code-block">
+        <pre><code># 1. Install dependencies
+pip install flask psycopg2-binary werkzeug
+
+# 2. Set environment variables
+export DATABASE_URL="postgresql://user:pass@host/db"
+export SECRET_KEY="your-secret-key"
+
+# 3. Create tables (Supabase SQL editor)
+# Run schema.sql
+
+# 4. Seed admin user
+python seed.py
+
+# 5. Run the app
+python app.py
+
+# App runs at: http://localhost:5000
+# Login: admin / admin123</code></pre>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
