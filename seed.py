@@ -8,7 +8,7 @@ import os
 
 DATABASE_URL = os.environ.get(
     'DATABASE_URL',
-    'postgresql://postgres.lmpelkcqwvximzvnobsr:nCg2UVPDxkZ3SvZJ@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres'
+    'postgresql://postgres.lmpelkcqwvximzvnobsr:nCg2UVPDxkZ3SvZJ@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require'
 )
 
 def seed():
